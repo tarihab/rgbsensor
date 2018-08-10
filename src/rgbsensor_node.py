@@ -13,7 +13,7 @@ import time
 import Adafruit_TCS34725
 
 import rospy
-from std_msgs.msg import Int32
+from rgbsensor.msg import rgbdata
 
 # Create a TCS34725 instance with default integration time (2.4ms) and gain (4x).
 import smbus
@@ -44,8 +44,8 @@ tcs.set_interrupt(False)
 f= open("rgbc_record.txt","w+")
 
 rospy.init_node('rgbsensor')
-pub = rospy.Publisher('rgbcdata', Int32[], queue_size=50)
-rate = rospy.Rate(0.05)
+pub = rospy.Publisher('rgbcdata', rgbdata, queue_size=50)
+rate = rospy.Rate(20)
 
 while not rospy.is_shutdown():
 	# Read the R, G, B, C color data.
@@ -66,15 +66,21 @@ while not rospy.is_shutdown():
 	# Print out color temperature.
 	if color_temp is None:
     		print('Too dark to determine color temperature!')
+		color_temp = -1
 	else:
     		print('Color Temperature: {0} K'.format(color_temp))
 
 	# Print out the lux.
 	print('Luminosity: {0} lux'.format(lux))
 
-	rgbc_value = (r, g, b, c)
+	msg = rgbdata()
+	msg.r = r
+	msg.g = g
+	msg.b = b
+	msg.temp = color_temp
+	msg.lum = lux
 
-	pub.publish(rgbc_value)
+	pub.publish(msg)
 	
 	rate.sleep()
 
