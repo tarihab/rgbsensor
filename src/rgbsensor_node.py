@@ -77,6 +77,7 @@ while not rospy.is_shutdown():
 	msg.r = r
 	msg.g = g
 	msg.b = b
+	msg.c = c
 	msg.temp = color_temp
 	msg.lum = lux
 
